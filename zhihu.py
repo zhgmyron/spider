@@ -10,6 +10,6 @@ s= requests.session()
 request = s.post(url1, data=values,headers=headers)
 
 
-page = s.get(url2,cookies=requests.cookies,headers=headers)
+page = s.get(url2, cookies=requests.cookies,headers=headers)
 
 print (page.text)
