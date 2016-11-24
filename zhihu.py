@@ -1,15 +1,35 @@
-#-*-coding=utf-8
+# -*- coding:utf-8 -*-
 import requests
-url1 ='http://ron.dev.revo.pricerunner.com/'
-url2 ='http://ron.dev.revo.pricerunner.com/merchant/profile/dashboard-pr.php'
+from bs4 import BeautifulSoup
+import re
+import urllib.request
+url1 ='https://accounts.douban.com/login'
+url2 ='https://www.douban.com/'
 
 user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64)'
-values = {'username' : 'dev_test@email.com',  'password' : 'test' }
+data = {'form_email' : '13262972387',
+          'form_password' : 'Zxcvb1234567',
+         'source':'index_nav',
+        'redir':'https://www.douban.com/',
+        "login":u'登录'
+          }
 headers = { 'User-Agent' : user_agent }
-s= requests.session()
-request = s.post(url1, data=values,headers=headers)
+s = requests.Session()
+request = s.post(url1, data=data,headers=headers)
+page =request.text
 
 
-page = s.get(url2, cookies=requests.cookies,headers=headers)
+reCaptchaID = r'<input type="hidden" name="captcha-id" value="(.*?)"/'
+captchaID = re.findall(reCaptchaID,page)
 
-print (page.text)
+soup= BeautifulSoup(page,"html.parser")
+captchaAddr = soup.find('img',id='captcha_image')['src']
+urllib.request.urlretrieve(captchaAddr,"captcha.jpg")
+captcha = input('please input the captcha:')
+data['captcha-solution'] = captcha
+data['captcha-id'] = captchaID
+r = requests.post(url1,data=data,headers=headers)
+
+print (r.text)
+
+
