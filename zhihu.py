@@ -1,35 +1,59 @@
 # -*- coding:utf-8 -*-
 import requests
-from bs4 import BeautifulSoup
 import re
-import urllib.request
-url1 ='https://accounts.douban.com/login'
-url2 ='https://www.douban.com/'
 
-user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64)'
-data = {'form_email' : '13262972387',
-          'form_password' : 'Zxcvb1234567',
-         'source':'index_nav',
-        'redir':'https://www.douban.com/',
-        "login":u'登录'
-          }
-headers = { 'User-Agent' : user_agent }
-s = requests.Session()
-request = s.post(url1, data=data,headers=headers)
-page =request.text
-soup= BeautifulSoup(page,"html.parser")
+def getContent(url):
 
-captchaAddr = soup.find('img',id='captcha_image')['src']
-if captchaAddr != None:
-    reCaptchaID = r'<input type="hidden" name="captcha-id" value="(.*?)"/'
-    captchaID = re.findall(reCaptchaID,page)
-    urllib.request.urlretrieve(captchaAddr,"captcha.jpg")
-    captcha = input('please input the captcha:')
-    data['captcha-solution'] = captcha
-    data['captcha-id'] = captchaID
-    r = s.post(url1,data=data,headers=headers)
+    r = requests.get(url)
 
-r=s.get(url2,headers=headers)
-print (r.text)
+    return r.content
 
 
+def getXSRF(url):
+
+    content = getContent(url)
+
+    pattern = re.compile('.*?<input type="hidden" name="_xsrf" value="(.*?)"/>.*?')
+
+    match = re.findall(pattern, content)
+    xsrf = match[0]
+
+    return xsrf
+
+
+def login(baseurl,email,password):
+
+    login_data = {
+            '_xsrf': getXSRF(baseurl),
+            'password': 'Zxcvb1234567',
+            'remember_me': 'true',
+            'email': 'guangking1987@163.com',
+    }
+
+    headers_base = {
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Encoding': 'gzip, deflate, sdch',
+        'Accept-Language': 'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4,zh-TW;q=0.2',
+        'Connection': 'keep-alive',
+        'Host': 'www.zhihu.com',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.130 Safari/537.36',
+        'Referer': 'http://www.zhihu.com/',
+    }
+
+    session = requests.session()
+
+    baseurl += "/login/email"
+
+    content = session.post(baseurl, headers = headers_base, data = login_data)
+
+    print (content.text)
+
+    s = session.get("http://www.zhihu.com", verify = False)
+    print (s.text.encode('utf-8'))
+
+    f = open('zhihu.txt', 'w')
+    f.write(s.text.encode('utf-8'))
+
+url = "http://www.zhihu.com"
+
+login(url,"******@***.com","************")

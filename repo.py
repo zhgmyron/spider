@@ -3,15 +3,14 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import urllib.request
-url1 ='http://dev.revo.pricerunner.com/'
-url2 ='http://dev.revo.pricerunner.com/common/user/index.php'
+url1 ='http://dev.repo.pricerunner.com/'
+url2 ='http://dev.repo.pricerunner.com/repo/logo/index.php'
 
 user_agent = 'Mozilla/5.0 (Windows NT 6.1; WOW64)'
 data = {
-        'username':'dev_test@email.com',
+        'account_login_csrf':'98d961cdc6ceebaa444449c710cec106',
+        'username':'netonnet',
         'password':'test',
-        'country':'GBR',
-        'adapter':'default',
         'submit':'submit'
           }
 headers = { 'User-Agent' : user_agent }
@@ -23,4 +22,4 @@ page =request.text
 #print (request.cookies)
 r = s.get(url2,headers=headers)
 
-print ()
+print (r.text)

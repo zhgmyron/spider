@@ -1,23 +1,11 @@
 #-*- coding: UTF-8 -*-
-import urllib2
+import requests
 
-from bs4 import BeautifulSoup
-for i in range(1,2):
+s = requests.Session()
+s.get('http://httpbin.org/cookies/set/sessioncookie/123456789')
+r = s.get("http://httpbin.org/cookies")
+print(r.text)
 
-    url = "http://www.0daydown.com/page/"+str(i)
-
-    headers={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64)'}
-    request = urllib2.Request(url,headers=headers)
-    page = urllib2.urlopen(request)
-
-    soup_packtpage = BeautifulSoup(page,"html5lib")
-
-    page.close()
-    num = " The Page of: " + str(i)
-    print(num)
-    print("#"*40)
-    print soup_packtpage.find('article', class_="excerpt")
-    for article in soup_packtpage.find_all('article', class_="excerpt"):
-
-        print "Note: ",article('p',class_='note').get_text()
-        print('-'*50)
+requests.get('http://httpbin.org/cookies/set/sessioncookie/123456789')
+r = requests.get("http://httpbin.org/cookies")
+print(r.text)
