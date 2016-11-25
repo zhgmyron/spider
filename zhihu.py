@@ -17,19 +17,19 @@ headers = { 'User-Agent' : user_agent }
 s = requests.Session()
 request = s.post(url1, data=data,headers=headers)
 page =request.text
-
-
-reCaptchaID = r'<input type="hidden" name="captcha-id" value="(.*?)"/'
-captchaID = re.findall(reCaptchaID,page)
-
 soup= BeautifulSoup(page,"html.parser")
-captchaAddr = soup.find('img',id='captcha_image')['src']
-urllib.request.urlretrieve(captchaAddr,"captcha.jpg")
-captcha = input('please input the captcha:')
-data['captcha-solution'] = captcha
-data['captcha-id'] = captchaID
-r = requests.post(url1,data=data,headers=headers)
 
+captchaAddr = soup.find('img',id='captcha_image')['src']
+if captchaAddr != None:
+    reCaptchaID = r'<input type="hidden" name="captcha-id" value="(.*?)"/'
+    captchaID = re.findall(reCaptchaID,page)
+    urllib.request.urlretrieve(captchaAddr,"captcha.jpg")
+    captcha = input('please input the captcha:')
+    data['captcha-solution'] = captcha
+    data['captcha-id'] = captchaID
+    r = s.post(url1,data=data,headers=headers)
+
+r=s.get(url2,headers=headers)
 print (r.text)
 
 
